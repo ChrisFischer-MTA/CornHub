@@ -1,7 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #define __STRINGLENGTH__ 100
 #define MAX_CORN_SUPPORTED 100
+
+
+// Credit to Stack Overflow Q #1921539
+typedef int bool;
+#define true 1
+#define false 0
+
 
 // Logic. Corn structure definition and global array.
 struct Corn 
@@ -166,8 +174,32 @@ void addInventory(){
 	writeToFile();
 }
 
+void delInventory(){
+	bool passed = false;
+	int i = 0, choice;
+	drawInventory();
+	printf("Please enter the SKU# to delete.\n");
+	// Use the choice function.
+	choice = getChoice(1, currentCorns, 1);
+	choice--;
+	// We now have the index of what to delete. Let's preform a swap of it and the last one.
+	if(choice!=currentCorns-1){
+		corns[choice] = corns[currentCorns-1];
+	}
+	currentCorns--;
+	writeToFile();
+	
+}
+
 void modInventory(){
-	printf("\n");
+	drawInventory();
+	printf("Enter 1 to add inventory. Enter 2 to delete inventory.\n");
+	if(getChoice(1,2,1)-1){
+		// Delete
+		delInventory();
+	}else{
+		addInventory();
+	}
 }
 
 void skuLookup(){
@@ -180,6 +212,93 @@ void skuLookup(){
 		if(i==sku){
 			printf("%08d		%c	 	%d		 %d		 %d\n", sku, corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
 		}
+	}
+	system("pause");
+}
+
+void drawPrice(){
+	int i, j;
+	readFileToMem();
+	/* I'll put this here.
+	There's a special place in hell for me because I did it this way.
+	Could I have done a merge sort or insertion sort? Sure!
+	But my possible values were so small, who cares?
+	This is a demonstration of creative programming.
+	*/
+	for(i = 0; i < INT_MAX; i++){
+		for(j = 0; j < currentCorns; j++){
+			if(corns[j].priceInCents == i){
+				printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", j+1, corns[j].color, corns[j].priceInCents/100, corns[j].priceInCents%100, corns[j].lengthInCM, corns[j].age);
+			}
+		}
+	}
+	system("pause");
+}
+
+void drawAge(){
+	readFileToMem
+	// Insertion Sort!
+	int i, j, smallest, smallestIndex;
+	struct Corn sortedCorns[MAX_CORN_SUPPORTED];
+	// For the purposes of my program, I'm going to copy corns into sortedCorns and play with that.
+	for(i = 0; i < currentCorns; i++){
+		sortedCorns[i] = corns[i];
+	}
+	struct Corn tempCorn;
+
+	for(i = 0; i < currentCorns; i++){
+		smallest = sortedCorns[i].age;
+		smallestIndex = i;
+		for(j = i; j < currentCorns; j++){
+			if(sortedCorns[j].age < smallest){
+				smallestIndex = j;
+				smallest = sortedCorns[j].age;
+			}
+		}
+		//so we've found the smallest.
+		//swap index i and the smallest.
+		if(smallestIndex!=i){
+			tempCorn = sortedCorns[i];
+			sortedCorns[i] = sortedCorns[smallestIndex];
+			sortedCorns[smallestIndex] = tempCorn;
+		}
+	}
+	for(i = 0; i < currentCorns; i++){
+		printf("%c 		$%d.%02d 		%d cm 		%d days old.\n", sortedCorns[i].color, sortedCorns[i].priceInCents/100, sortedCorns[i].priceInCents%100, sortedCorns[i].lengthInCM, sortedCorns[i].age);
+	}
+	system("pause");
+}
+
+void drawLen(){
+	readFileToMem();
+	// Insertion Sort!
+	int i, j, smallest, smallestIndex;
+	struct Corn sortedCorns[MAX_CORN_SUPPORTED];
+	// For the purposes of my program, I'm going to copy corns into sortedCorns and play with that.
+	for(i = 0; i < currentCorns; i++){
+		sortedCorns[i] = corns[i];
+	}
+	struct Corn tempCorn;
+
+	for(i = 0; i < currentCorns; i++){
+		smallest = sortedCorns[i].lengthInCM;
+		smallestIndex = i;
+		for(j = i; j < currentCorns; j++){
+			if(sortedCorns[j].lengthInCM < smallest){
+				smallestIndex = j;
+				smallest = sortedCorns[j].lengthInCM;
+			}
+		}
+		//so we've found the smallest.
+		//swap index i and the smallest.
+		if(smallestIndex!=i){
+			tempCorn = sortedCorns[i];
+			sortedCorns[i] = sortedCorns[smallestIndex];
+			sortedCorns[smallestIndex] = tempCorn;
+		}
+	}
+	for(i = 0; i < currentCorns; i++){
+		printf("%c 		$%d.%02d 		%d cm 		%d days old.\n", sortedCorns[i].color, sortedCorns[i].priceInCents/100, sortedCorns[i].priceInCents%100, sortedCorns[i].lengthInCM, sortedCorns[i].age);
 	}
 	system("pause");
 }
@@ -217,7 +336,22 @@ void drawMainMenu(){
 	int choice = getChoice(1,7,1);
 	switch(choice){
 		case 1:
-			drawInventory();
+			printf("Please choose one of the following:\n1 Sorted by price.\n2 Sorted by age.\n3 Sorted by length.\n4 Sorted by SKU number.\n");
+			choice = getChoice(1,4,1);
+			switch(choice){
+				case 1:
+					drawPrice();
+					break;
+				case 2:
+					drawAge();
+					break;
+				case 3:
+					drawLen();
+					break;
+				case 4:
+					drawInventory();
+					break;
+			}
 			break;
 		case 2:
 			modInventory();
