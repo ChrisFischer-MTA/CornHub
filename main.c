@@ -7,7 +7,6 @@
 struct Corn 
 {
     char color;
-    
     int priceInCents;
     int age; // Anything over 30 days is assumed to be bad.
     int lengthInCM;
@@ -43,6 +42,8 @@ void readFileToMem(){
 	cornStorage = fopen("izisulu.bin", "rb");
 	if(cornStorage == NULL){
 		printf("Error! File does not exist!\n");
+		cornStorage = fopen("izisulu.bin", "wb");
+		printf("Creating, please re-preform this operation.\n");
 	}else{
 		fscanf(cornStorage, "%d\n", &piecesOfCorn);
 	}
@@ -76,6 +77,9 @@ void writeToFile(){
 	}
 }
 
+void pause(){
+	system("pause");
+}
 
 /*
 Drawing Related.
@@ -129,17 +133,55 @@ void drawInventory(){
 	// Iterate through the stored corn.
 	int i;
 	for(i = 0; i < currentCorns; i++){
-		printf("%d. 	%c 		$%d.%d 		%d cm 		%d days old.\n", i+1, corns[i].color, corns[i].priceInCents/100, corns[i].priceInCents%100, corns[i].lengthInCM, corns[i].age);
+		printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", i+1, corns[i].color, corns[i].priceInCents/100, corns[i].priceInCents%100, corns[i].lengthInCM, corns[i].age);
 	}
-	
+	pause();
 }
 
 void addInventory(){
-	
+	struct Corn tempCorn;
+	// First, let's make sure everything is current.
+	readFileToMem();
+	currentCorns++;
+	// Are we going to surpass our maximum amount of corn?
+	if(MAX_CORN_SUPPORTED <= currentCorns){
+		// We've eclipsed supported storage.
+		printf("(Warning) Can not add corn due to maximum corn limit reached.\n");
+		pause();
+		return;
+	}
+	// Great, now let's add our new corn.
+	// Let's make a temporary corn!
+	printf("Please enter the corn's color code.\n");
+	scanf(" %c", &tempCorn.color);
+	printf("Please enter the corn's price in cents.\n");
+	scanf("%d", &tempCorn.priceInCents);
+	printf("Please enter the corn's age in days.\n");
+	scanf("%d", &tempCorn.age);
+	printf("Please enter the corn's length in CM.\n");
+	scanf("%d", &tempCorn.lengthInCM);
+	corns[currentCorns-1] = tempCorn;
+	pause();
+	// Flush
+	writeToFile();
+}
+
+void modInventory(){
+	printf("\n");
 }
 
 void skuLookup(){
-	
+	int i, sku;
+	readFileToMem();
+	printf("Please enter desired SKU.\n");
+	scanf("%d", &sku);
+	printf("SKU    			COLOR         PRICE		AGE  	     LENGTH\n");
+	for(i = 0; i < currentCorns; i++){
+		if(i==sku){
+			printf("%08d		%c	 	%d		 %d		 %d\n", sku, corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
+		}
+	}
+	system("pause");
 }
 
 void salesHistory(){
@@ -165,20 +207,20 @@ void drawMainMenu(){
 	printf("\n");
 	drawMiddle("", 0, '#');
 	drawMiddle("                     1. View Inventory                           ", 65, '#');
-	drawMiddle("                     2. Add to Invetory                          ", 65, '#');
+	drawMiddle("                     2. Modify Invetory                          ", 65, '#');
 	drawMiddle("                     3. Lookup by SKU                            ", 65, '#');
 	drawMiddle("                     4. View Sales History                       ", 65, '#');
 	drawMiddle("                     5. Checkout Person                          ", 65, '#');
 	drawMiddle("                     6. Lookup by Artifact                       ", 65, '#');
 	drawMiddle("                     7. Exit The Program                         ", 65, '#');
 	drawMiddle("", 0, '#');
-	int choice = getChoice(1,6,1);
+	int choice = getChoice(1,7,1);
 	switch(choice){
 		case 1:
 			drawInventory();
 			break;
 		case 2:
-			addInventory();
+			modInventory();
 			break;
 		case 3:
 			skuLookup();
