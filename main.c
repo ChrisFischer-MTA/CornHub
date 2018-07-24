@@ -236,7 +236,7 @@ void drawPrice(){
 }
 
 void drawAge(){
-	readFileToMem
+	readFileToMem();
 	// Insertion Sort!
 	int i, j, smallest, smallestIndex;
 	struct Corn sortedCorns[MAX_CORN_SUPPORTED];
