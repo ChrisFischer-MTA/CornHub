@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <time.h>
 #define __STRINGLENGTH__ 100
 #define MAX_CORN_SUPPORTED 100
 
@@ -20,6 +21,16 @@ struct Corn
     int lengthInCM;
 };
 
+// It's not lost on me - this is the same word when referencing a SQL transaction. This would be bad practice if the program
+// had any practical purpose. Given it's purely academic, this is permissable.
+struct transaction
+{
+	int dayOfMonth;
+	int month;
+	int year;
+	int priceInCents;
+	int customerID;
+};
 struct Corn corns[MAX_CORN_SUPPORTED];
 int currentCorns = 0;
 
@@ -304,11 +315,87 @@ void drawLen(){
 }
 
 void salesHistory(){
+	/*
+	First we open the file.
+	*/
+	FILE* transactionStorage;
+	int numOfTransactions = 0, i;
+	int dayOfMonth, month, year, priceInCents, customerID;
 	
+	transactionStorage = fopen("history.bin", "rb");
+	if(transactionStorage == NULL){
+		
+		printf("Error! File does not exist!\n");
+		transactionStorage = fopen("history.bin", "wb");
+		printf("Creating, please re-preform this operation.\n");
+		
+	}else{
+		// Grab number of transactions.
+	
+	}
+	// TODO: Create logic to go to EOF
+	
+	while((fscanf(transactionStorage, "%d %d %d %d %d \n", &dayOfMonth, &month, &year, &priceInCents, &customerID)==1) {// Read correctly.
+		printf("- %d %d %d %d %d \n",dayOfMonth, month, year, priceInCents, customerID, );
+	}
+	fclose(transactionStorage);
+	system("pause");
+}
+
+void writeToHistoryFile(int customerID, int total){
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	
+	
+	FILE* transactionStorage;
+	int numOfTransactions = 0, i;
+	int dayOfMonth, month, year;
+	
+	transactionStorage = fopen("history.bin", "ab");
+	if(transactionStorage == NULL){
+		printf("Error! File does not exist!\n");
+		transactionStorage = fopen("history.bin", "wb");
+		printf("Creating, please re-preform this operation.\n");
+		}else{
+			
+	}	
+	fprintf(transactionStorage, "%d %d %d %d %d \n", &dayOfMonth, &month, &year, &priceInCents, &customerID);
+	
+	fclose(transactionStorage);
+	system("pause");
 }
 
 void checkPerson(){
 	
+	int total, choice, i, cID;
+	drawMiddle("", 0, '#');
+	drawMiddle("      Welcome to checkout!    ", 30, '#');
+	drawMiddle("", 0, '#');
+	drawInventory();
+	struct Corn tempCorn;
+	printf("Enter the SKU #. \n");
+	choice = getChoice(1,currentCorns,1);
+	choice--;
+	for(i=0; i < currentCorns; i++){
+		if(i==choice-1){
+		printf("Your selected corn: ");	
+		printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", choice-1, corns[choice-1].color, corns[choice-1].priceInCents/100, corns[choice-1].priceInCents%100, corns[choice-1].lengthInCM, corns[choice-1].age);
+		}
+	}
+	printf("Your total is: \t $%d.%02d", corns[choice].priceInCents/100, corns[choice].priceInCents%100);
+	total = corns[choice].priceInCents;
+	printf("Please enter your customer ID, or type zero to use the store's customer ID.\n'");
+	scanf("%d", &cID);
+	if(choice!=currentCorns-1){
+			corns[choice] = corns[currentCorns-1];
+			currentCorns--;
+			writeToFile();
+		}
+	else{
+		currentCorns--;
+		writeToFile();
+	}
+	system("pause");
 }
 
 void specificSearch(){
@@ -376,6 +463,7 @@ void drawMainMenu(){
 
 
 int main(int argc, char *argv[]) {
+
 	while(1){
 		drawMainMenu();
 	}
