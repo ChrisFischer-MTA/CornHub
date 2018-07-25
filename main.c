@@ -5,6 +5,13 @@
 #define __STRINGLENGTH__ 100
 #define MAX_CORN_SUPPORTED 100
 
+/*
+Christopher R. Fischer
+7/23-7/25/2018
+Valencia Community College - COP 2220C
+*/
+
+
 
 // Credit to Stack Overflow Q #1921539
 typedef int bool;
@@ -42,6 +49,7 @@ int getChoice(int minimum, int maximum, int attempt){
 	int choice;
 	printf("Enter any number between %d and %d.\n", minimum, maximum);
 	scanf("%d", &choice);
+	// If the user is incapable after 5 tries, we give up on them.
 	if(attempt >= 5){
 		printf("Error! User unable to input the correct choice. Layer 8 issue. Exiting");
 		exit(1);
@@ -59,6 +67,7 @@ void readFileToMem(){
 	int piecesOfCorn;
 	// an izisulu is a place to store maize on a farm.
 	cornStorage = fopen("izisulu.bin", "rb");
+	// if it does not exist, create it.
 	if(cornStorage == NULL){
 		printf("Error! File does not exist!\n");
 		cornStorage = fopen("izisulu.bin", "wb");
@@ -67,6 +76,7 @@ void readFileToMem(){
 		fscanf(cornStorage, "%d\n", &piecesOfCorn);
 	}
 	currentCorns = piecesOfCorn;
+	// Read the contents of the file to memory.
 	for(piecesOfCorn=0; piecesOfCorn<currentCorns; piecesOfCorn++){
 		fscanf(cornStorage, "%c %d %d %d\n", &corns[piecesOfCorn].color, &corns[piecesOfCorn].priceInCents, &corns[piecesOfCorn].age, &corns[piecesOfCorn].lengthInCM);
 	}
@@ -77,8 +87,6 @@ void writeSpecificCorn(int i, char color, int price, int age, int length){
 	FILE* cornStorage;
 	// an izisulu is a place to store maize on a farm.
 	cornStorage = fopen("izisulu.bin", "ab");
-	// fprintf(cornStorage, "%d\n", currentCorns);
-	printf("(Printing) %c %d %d %d\n", corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
 	fprintf(cornStorage, "%c %d %d %d\n", corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
 	fclose(cornStorage);
 }
@@ -87,10 +95,10 @@ void writeToFile(){
 	int i;
 	FILE* cornStorage;
 	cornStorage = fopen("izisulu.bin", "wb");
-	
+	// Dump number of corns to the file. We use this as a counter.
 	fprintf(cornStorage, "%d\n", currentCorns);
 	fclose(cornStorage);
-	
+	// Iterate and store values into file.
 	for(i = 0; i < currentCorns; i++){
 		writeSpecificCorn(i,corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
 	}
@@ -219,6 +227,7 @@ void skuLookup(){
 	printf("Please enter desired SKU.\n");
 	scanf("%d", &sku);
 	printf("SKU    			COLOR         PRICE		AGE  	     LENGTH\n");
+	// Just find that one.
 	for(i = 0; i < currentCorns; i++){
 		if(i==sku){
 			printf("%08d		%c	 	%d		 %d		 %d\n", sku, corns[i].color, corns[i].priceInCents, corns[i].age, corns[i].lengthInCM);
@@ -329,9 +338,9 @@ void salesHistory(){
 		transactionStorage = fopen("history.bin", "wb");
 		printf("Creating, please re-preform this operation.\n");
 		
-	}
+	}	printf("Date     Total   Customer ID\n");
 	while((fscanf(transactionStorage, "%d %d %d %d %d\n", &dayOfMonth, &month, &year, &priceInCents, &customerID)==5)) {// Read correctly.
-		printf("%d/%d/%d $%d ID:%d \n",dayOfMonth, 1+month, 1900+year, priceInCents, customerID);
+		printf("%d/%d/%d $%d.%d ID:%d \n",dayOfMonth, 1+month, 1900+year, priceInCents/100, priceInCents%100, customerID);
 	}
 	fclose(transactionStorage);
 	system("pause");
@@ -345,7 +354,7 @@ void writeToHistoryFile(int customerID, int total){
 	FILE* transactionStorage;
 	int numOfTransactions = 0, i;
 	int dayOfMonth, month, year;
-	
+	//  Open up to append!
 	transactionStorage = fopen("history.bin", "ab");
 	if(transactionStorage == NULL){
 		printf("Error! File does not exist!\n");
@@ -354,8 +363,9 @@ void writeToHistoryFile(int customerID, int total){
 		}else{
 			
 	}	
+
 	fprintf(transactionStorage, "%d %d %d %d %d \n", timeMacro.tm_mday, timeMacro.tm_mon, timeMacro.tm_year, total, customerID);
-	printf("(Debug!)%d %d %d %d %d \n", timeMacro.tm_mday, timeMacro.tm_mon, timeMacro.tm_year, total, customerID);
+	//printf("(Debug!)%d %d %d %d %d \n", timeMacro.tm_mday, timeMacro.tm_mon, timeMacro.tm_year, total, customerID);
 	fclose(transactionStorage);
 	system("pause");
 }
@@ -370,11 +380,11 @@ void checkPerson(){
 	struct Corn tempCorn;
 	printf("Enter the SKU #. \n");
 	choice = getChoice(1,currentCorns,1);
-	choice--;
+	choice;
 	for(i=0; i < currentCorns; i++){
-		if(i==choice-1){
+		if(i==choice){
 		printf("Your selected corn: \n");	
-		printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", choice-1, corns[choice-1].color, corns[choice-1].priceInCents/100, corns[choice-1].priceInCents%100, corns[choice-1].lengthInCM, corns[choice-1].age);
+		printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", choice, corns[choice-1].color, corns[choice-1].priceInCents/100, corns[choice-1].priceInCents%100, corns[choice-1].lengthInCM, corns[choice-1].age);
 		}
 	}
 	printf("Your total is: \t $%d.%02d", corns[choice].priceInCents/100, corns[choice].priceInCents%100);
@@ -391,7 +401,6 @@ void checkPerson(){
 		writeToFile();
 	}
 	writeToHistoryFile(cID, total);
-	system("pause");
 }
 
 void specificSearch(){
@@ -410,7 +419,7 @@ void drawMainMenu(){
 	printf("\n");
 	drawMiddle("", 0, '#');
 	drawMiddle("                     1. View Inventory                           ", 65, '#');
-	drawMiddle("                     2. Modify Invetory                          ", 65, '#');
+	drawMiddle("                     2. Modify Inventory                         ", 65, '#');
 	drawMiddle("                     3. Lookup by SKU                            ", 65, '#');
 	drawMiddle("                     4. View Sales History                       ", 65, '#');
 	drawMiddle("                     5. Checkout Person                          ", 65, '#');
@@ -420,36 +429,46 @@ void drawMainMenu(){
 	int choice = getChoice(1,7,1);
 	switch(choice){
 		case 1:
+			system("cls");
 			printf("Please choose one of the following:\n1 Sorted by price.\n2 Sorted by age.\n3 Sorted by length.\n4 Sorted by SKU number.\n");
 			choice = getChoice(1,4,1);
 			switch(choice){
 				case 1:
+					system("cls");
 					drawPrice();
 					break;
 				case 2:
+					system("cls");
 					drawAge();
 					break;
 				case 3:
+					system("cls");
 					drawLen();
 					break;
 				case 4:
+					system("cls");
 					drawInventory();
 					break;
 			}
 			break;
 		case 2:
+			system("cls");
 			modInventory();
 			break;
 		case 3:
+			system("cls");
 			skuLookup();
 			break;
 		case 4:
+			system("cls");
 			salesHistory();
 			break;
 		case 5:
+			system("cls");
 			checkPerson();
 			break;
 		case 6: 
+			system("cls");
 			specificSearch();
 			break;
 		case 7:
