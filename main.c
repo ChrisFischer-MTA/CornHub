@@ -329,14 +329,9 @@ void salesHistory(){
 		transactionStorage = fopen("history.bin", "wb");
 		printf("Creating, please re-preform this operation.\n");
 		
-	}else{
-		// Grab number of transactions.
-	
 	}
-	// TODO: Create logic to go to EOF
-	
-	while((fscanf(transactionStorage, "%d %d %d %d %d \n", &dayOfMonth, &month, &year, &priceInCents, &customerID)==1) {// Read correctly.
-		printf("- %d %d %d %d %d \n",dayOfMonth, month, year, priceInCents, customerID, );
+	while((fscanf(transactionStorage, "%d %d %d %d %d\n", &dayOfMonth, &month, &year, &priceInCents, &customerID)==5)) {// Read correctly.
+		printf("%d/%d/%d $%d ID:%d \n",dayOfMonth, 1+month, 1900+year, priceInCents, customerID);
 	}
 	fclose(transactionStorage);
 	system("pause");
@@ -344,7 +339,7 @@ void salesHistory(){
 
 void writeToHistoryFile(int customerID, int total){
 	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
+	struct tm timeMacro = *localtime(&t);
 	
 	
 	FILE* transactionStorage;
@@ -359,8 +354,8 @@ void writeToHistoryFile(int customerID, int total){
 		}else{
 			
 	}	
-	fprintf(transactionStorage, "%d %d %d %d %d \n", &dayOfMonth, &month, &year, &priceInCents, &customerID);
-	
+	fprintf(transactionStorage, "%d %d %d %d %d \n", timeMacro.tm_mday, timeMacro.tm_mon, timeMacro.tm_year, total, customerID);
+	printf("(Debug!)%d %d %d %d %d \n", timeMacro.tm_mday, timeMacro.tm_mon, timeMacro.tm_year, total, customerID);
 	fclose(transactionStorage);
 	system("pause");
 }
@@ -378,13 +373,13 @@ void checkPerson(){
 	choice--;
 	for(i=0; i < currentCorns; i++){
 		if(i==choice-1){
-		printf("Your selected corn: ");	
+		printf("Your selected corn: \n");	
 		printf("%08d. 	%c 		$%d.%02d 		%d cm 		%d days old.\n", choice-1, corns[choice-1].color, corns[choice-1].priceInCents/100, corns[choice-1].priceInCents%100, corns[choice-1].lengthInCM, corns[choice-1].age);
 		}
 	}
 	printf("Your total is: \t $%d.%02d", corns[choice].priceInCents/100, corns[choice].priceInCents%100);
 	total = corns[choice].priceInCents;
-	printf("Please enter your customer ID, or type zero to use the store's customer ID.\n'");
+	printf("\nPlease enter your customer ID, or type zero to use the store's customer ID.\n");
 	scanf("%d", &cID);
 	if(choice!=currentCorns-1){
 			corns[choice] = corns[currentCorns-1];
@@ -395,11 +390,13 @@ void checkPerson(){
 		currentCorns--;
 		writeToFile();
 	}
+	writeToHistoryFile(cID, total);
 	system("pause");
 }
 
 void specificSearch(){
-	
+	printf("Your store must upgrade to the premium package in order to access this feature!\n");
+	system("pause");
 }
 
 
